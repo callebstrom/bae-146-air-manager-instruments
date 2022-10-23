@@ -9,6 +9,35 @@ local MIN_NEEDLE_ROTATION = 7;
 local MAX_NEEDLE_ROTATION = 238;
 local NEEDLE_RANGE = MAX_NEEDLE_ROTATION - MIN_NEEDLE_ROTATION;
 
+function print_absolute_number(item_nr)
+  if item_nr < 0 then
+      return "" .. 10 + item_nr
+  else
+      return "" .. item_nr
+  end
+end
+
+canvas_id = canvas_add(0, 0, 258, 258, function()
+  _rect(111, 69, 150, 25)
+  _fill("#333333")
+end)
+
+local engine_user_prop = user_prop_add_enum("Engine", "ENG1,ENG2,ENG3,ENG4", "ENG1", "Engine");
+
+local engine_n1_bug_dig1_text = running_txt_add_ver(111,70,10,50,18,print_absolute_number, "size:22; color: yellow;")
+local engine_n1_bug_dig2_text = running_txt_add_ver(123,70,10,50,18,print_absolute_number, "size:22; color: yellow;")
+local engine_n1_bug_dig3_text = running_txt_add_ver(135,70,10,50,18,print_absolute_number, "size:22; color: yellow;")
+
+canvas_id = canvas_add(0, 0, 258, 258, function()
+  _rect(82, 163, 150, 50)
+  _fill("#333333")
+end)
+
+local engine_n1_value_dig1_text = running_txt_add_ver(87,163,10,50,36,print_absolute_number, "size:42; color: white;")
+local engine_n1_value_dig2_text = running_txt_add_ver(115,163,10,50,36,print_absolute_number, "size:42; color: white;")
+local engine_n1_value_dot_text = txt_add(".","size:48px; color: white; halign:left;", 130,170,150,100)
+local engine_n1_value_dig3_text = running_txt_add_ver(145,163,10,50,36,print_absolute_number, "size:42; color: white;")
+
 img_add_fullscreen("background.png")
 img_n1_bug = img_add_fullscreen("gauge_bug.png")
 img_n1_bug_knob = img_add_fullscreen("gauge_bug_knob.png")
@@ -16,15 +45,6 @@ img_n1_needle = img_add_fullscreen("gauge_needle.png")
 
 rotate(img_n1_bug, MAX_BUG_ROTATION);
 move(img_n1_bug_knob, 87, 87);
-
-local engine_user_prop = user_prop_add_enum("Engine", "ENG1,ENG2,ENG3,ENG4", "ENG1", "Engine");
-local engine_n1_value_dig1_text = txt_add(" ","size:48px; color: white; halign:left;", 90,163,150,100)
-local engine_n1_value_dig2_text = txt_add(" ","size:48px; color: white; halign:left;", 115,163,150,100)
-local engine_n1_value_dot_text = txt_add(".","size:48px; color: white; halign:left;", 130,170,150,100)
-local engine_n1_value_dig3_text = txt_add(" ","size:48px; color: white; halign:left;", 145,163,150,100)
-local engine_n1_bug_dig1_text = txt_add(" ","size:22px; color: yellow; halign:left;", 112,72,150,100)
-local engine_n1_bug_dig2_text = txt_add(" ","size:22px; color: yellow; halign:left;", 124,72,150,100)
-local engine_n1_bug_dig3_text = txt_add(" ","size:22px; color: yellow; halign:left;", 136,72,150,100)
 
 local last_n1_bug_knob = 0;
 
@@ -79,14 +99,17 @@ function update(n1_dig1, n1_dig2, n1_dig3, n1_needle, n1_bug_dig1, n1_bug_dig2, 
     end
     
     if power >= 1 then
-        txt_set(engine_n1_value_dig1_text, string.format("%.0f", n1_dig1_cap))
-        txt_set(engine_n1_value_dig2_text, string.format("%.0f", n1_dig2_cap))
-        txt_set(engine_n1_value_dig3_text, string.format("%.f", n1_dig3_cap))
-        txt_set(engine_n1_bug_dig1_text, string.format("%.0f", n1_bug_dig1_cap))
-        txt_set(engine_n1_bug_dig2_text, string.format("%.0f", n1_bug_dig2_cap))
-        txt_set(engine_n1_bug_dig3_text, string.format("%.0f", n1_bug_dig3_cap))
+        running_txt_move_carot(engine_n1_value_dig1_text, n1_dig1_cap - 5)
+        running_txt_move_carot(engine_n1_value_dig2_text, n1_dig2_cap - 5)
+        running_txt_move_carot(engine_n1_value_dig3_text, n1_dig3_cap - 5)
+
+        running_txt_move_carot(engine_n1_bug_dig1_text, n1_bug_dig1_cap - 5)
+        running_txt_move_carot(engine_n1_bug_dig2_text, n1_bug_dig2_cap - 5)
+        running_txt_move_carot(engine_n1_bug_dig3_text, n1_bug_dig3_cap - 5)
     else
-        txt_set(engine_n1_value_text, "000")
+        running_txt_move_carot(engine_n1_bug_dig1_text, 0)
+        running_txt_move_carot(engine_n1_bug_dig2_text, 0)
+        running_txt_move_carot(engine_n1_bug_dig3_text, 0)
         txt_set(engine_n1_bug_text, "000")
     end
     
