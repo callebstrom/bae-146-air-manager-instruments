@@ -1,5 +1,5 @@
 # bae-146-air-manager-instruments
-BAr-146 Instruments for Simstrumentation Air Manager
+BAr-146 Instruments for Simstrumentation [Air Manager](https://siminnovations.com/3-about-air-manager)
 
 ### N1 gauge with N1 bug
 ![preview](https://github.com/callebstrom/bae-146-air-manager-instruments/raw/master/src/n1_gauge/preview.png)
