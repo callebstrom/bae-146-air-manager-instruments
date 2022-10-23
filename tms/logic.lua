@@ -103,6 +103,73 @@ button_add(nil, nil, 195, 618, 139, 149, function() on_press("CTRL") end, nil)
 button_add(nil, nil, 349, 618, 139, 149, function() on_press("MSTR") end, nil)
 button_add(nil, nil, 489, 618, 139, 149, function() on_press("PWR") end, nil)
 
+button_add(nil, nil, 486, 794, 148, 148, function() on_press("TEST") end, nil)
+
+local latest_values = {
+  ["L:R_TMS_TGT_dig1"] = 0,
+  ["L:R_TMS_TGT_dig2"] = 0,
+  ["L:R_TMS_TGT_dig3"] = 0,
+  ["L:R_TMS_Ref_dig1"] = 0,
+  ["L:R_TMS_Ref_dig2"] = 0,
+  ["L:R_TMS_Ref_dig3"] = 0
+}
+
+function increment(variable, min, max)
+    min = min ~= nil and min or 0
+    max = max ~= nil and max or 9
+    
+    return function()
+        latest_values[variable] = var_cap(latest_values[variable] + 1, min, max);
+        fs2020_variable_write(variable, "Number", latest_values[variable])
+    end
+end
+
+function decrement(variable, min, max)
+    min = min ~= nil and min or 0
+    max = max ~= nil and max or 9
+
+    return function()
+        latest_values[variable] =  var_cap(latest_values[variable] - 1, min, max);
+        fs2020_variable_write(variable, "Number", latest_values[variable])
+    end
+end
+
+local scroll_handler = {
+    TGT1_INC = increment("L:R_TMS_TGT_dig1", 6, 8),
+    TGT2_INC = increment("L:R_TMS_TGT_dig2"),
+    TGT3_INC = increment("L:R_TMS_TGT_dig3"),
+    TGT1_DEC = decrement("L:R_TMS_TGT_dig1", 6, 8),
+    TGT2_DEC = decrement("L:R_TMS_TGT_dig2"),
+    TGT3_DEC = decrement("L:R_TMS_TGT_dig3"),
+    
+    REF_SIGN_INC = increment("L:R_TMS_Ref_dig1", 0, 1),
+    REF1_INC = increment("L:R_TMS_Ref_dig2"),
+    REF2_INC = increment("L:R_TMS_Ref_dig3"),
+    REF_SIGN_DEC = decrement("L:R_TMS_Ref_dig1", 0, 1),
+    REF1_DEC = decrement("L:R_TMS_Ref_dig2"),
+    REF2_DEC = decrement("L:R_TMS_Ref_dig3"),
+}
+
+function on_scroll(variable)
+  return function(direction)
+      if direction == -1 then
+         scroll_handler[variable .. "_INC"]()
+      end
+    
+      if direction == 1 then
+        scroll_handler[variable .. "_DEC"]()
+      end
+  end
+end
+
+scrollwheel_add_ver("tms_scrollwheel.png", 190, 810, 17, 125, 50, 50, on_scroll("TGT1"))
+scrollwheel_add_ver("tms_scrollwheel.png", 250, 810, 17, 125, 50, 50, on_scroll("TGT2"))
+scrollwheel_add_ver("tms_scrollwheel.png", 305, 810, 17, 125, 50, 50, on_scroll("TGT3"))
+
+scrollwheel_add_ver("tms_scrollwheel.png", 423, 140, 17, 125, 50, 50, on_scroll("REF_SIGN"))
+scrollwheel_add_ver("tms_scrollwheel.png", 487, 140, 17, 125, 50, 50, on_scroll("REF1"))
+scrollwheel_add_ver("tms_scrollwheel.png", 540, 140, 17, 125, 50, 50, on_scroll("REF2"))
+
 local TRIANGLE_WIDTH = 30;
 local HALF_TRIANGLE_WIDTH =  TRIANGLE_WIDTH / 2
 local FIRST_COL = 80;
@@ -158,6 +225,9 @@ end
 
 local TEST_SQUARE_SIZE = 55;
 local TEST_SQUARE_LINES_WIDTH = 6;
+
+local REF_SIGN_POSITIVE = 0;
+local REF_SIGN_NEGATIVE = 1;
     
 canvas = canvas_add(0, 0, 690, 1080, nil)
 
@@ -226,8 +296,6 @@ function update(eng1_n1,
         power = 0
     end
     
-    local ref = 88.8;
-    
     if ctrl_n1 == 1 then
         txt_set(ctrl_n1_text, "N1");
     elseif ctrl_n2 == 1 then
@@ -259,29 +327,13 @@ function update(eng1_n1,
         txt_set(mstr_2_text, "");
     end
     
-    local tgt_ref = tgt_dig1 * 100 + tgt_dig2 * 10 + tgt_dig3;
+    local tgt_dig1_cap = var_cap(tgt_dig1, 0, 9)
+    local tgt_dig2_cap = var_cap(tgt_dig2, 0, 9)
+    local tgt_dig3_cap = var_cap(tgt_dig3, 0, 9)
     
-    if tgt_up == 1 then
-        ref = tgt_ref;
-    elseif ctrl_n1 == 1 and mstr_1 == 1 then
-        ref = eng1_n1;
-    elseif ctrl_n1 == 1 and mstr_2 == 1 then
-        ref = eng2_n1;
-    elseif ctrl_n2 == 1 and mstr_1 == 1 then
-        ref = eng1_n2;
-    elseif ctrl_n2 == 1 and mstr_2 == 1 then
-        ref = eng2_n2;
-    elseif desc_up == 1 then
-        ref = 60.0;
-    elseif mct_up == 1 then
-        ref = 857
-    end
-    
-    txt_set(ref_text, ref >= 100 and string.format("%.0f", ref) or string.format("%.1f", ref));
-    
-    txt_set(tgt_dig1_text, string.format("%.0f", var_cap(tgt_dig1, 0, 9)));
-    txt_set(tgt_dig2_text, string.format("%.0f", var_cap(tgt_dig2, 0, 9)));
-    txt_set(tgt_dig3_text, string.format("%.0f", var_cap(tgt_dig3, 0, 9)));
+    txt_set(tgt_dig1_text, string.format("%.0f", tgt_dig1_cap));
+    txt_set(tgt_dig2_text, string.format("%.0f", tgt_dig2_cap));
+    txt_set(tgt_dig3_text, string.format("%.0f", tgt_dig3_cap));
     
     local ref_dig2_cap = var_cap(ref_dig2, 0, 9);
     local ref_dig3_cap = var_cap(ref_dig3, 0, 9);
@@ -290,6 +342,62 @@ function update(eng1_n1,
     running_txt_move_carot(ref_dig2_text, ref_dig2_cap - 5)
     running_txt_move_carot(ref_dig3_text, ref_dig3_cap - 5)
     
+    latest_values["L:R_TMS_TGT_dig1"] = tgt_dig1_cap;
+    latest_values["L:R_TMS_TGT_dig2"] = tgt_dig2_cap;
+    latest_values["L:R_TMS_TGT_dig3"] = tgt_dig3_cap;
+    latest_values["L:R_TMS_Ref_dig1"] = ref_dig1;
+    latest_values["L:R_TMS_Ref_dig2"] = ref_dig2_cap;
+    latest_values["L:R_TMS_Ref_dig3"] = ref_dig3_cap; 
+        
+    local tgt_value = 88.8;
+    
+    if tgt_up == 1 then
+        tgt_value = tgt_dig1 * 100 + tgt_dig2 * 10 + tgt_dig3;
+    elseif ctrl_n1 == 1 and mstr_1 == 1 then
+        tgt_value = eng1_n1;
+    elseif ctrl_n1 == 1 and mstr_2 == 1 then
+        tgt_value = eng2_n1;
+    elseif ctrl_n2 == 1 and mstr_1 == 1 then
+        tgt_value = eng1_n2;
+    elseif ctrl_n2 == 1 and mstr_2 == 1 then
+        tgt_value = eng2_n2;
+    elseif desc_up == 1 then
+        tgt_value = 60.0;
+    elseif mct_up == 1 then
+        tgt_value = 857
+    elseif to1_up or to2_up then
+        local ref_value = ref_dig2 * 10 + ref_dig3;
+        if ref_dig1 == REF_SIGN_POSITIVE then
+            if ref_value >= 57 then tgt_value = 87.7
+            elseif ref_value > 51 then tgt_value = 88.1
+            elseif ref_value > 46 then tgt_value = 88.6
+            elseif ref_value > 41 then tgt_value = 88.9
+            elseif ref_value > 36 then tgt_value = 89.9
+            elseif ref_value > 31 then tgt_value = 90.7
+            elseif ref_value > 26 then tgt_value = 91.4
+            elseif ref_value > 21 then tgt_value = 92.2
+            elseif ref_value > 16 then tgt_value = 93.0
+            elseif ref_value > 11 then tgt_value = 93.7
+            elseif ref_value > 6 then tgt_value = 92.9
+            elseif ref_value > 1 then tgt_value = 92.1
+            elseif ref_value >= 0 then tgt_value = 91.3 end
+        elseif ref_dig1 == REF_SIGN_NEGATIVE then
+            if ref_value < 5 then tgt_value = 91.3
+            elseif ref_value < 10 then tgt_value = 90.5
+            elseif ref_value < 15 then tgt_value = 89.7
+            elseif ref_value < 20 then tgt_value = 88.8
+            elseif ref_value < 25 then tgt_value = 87.9
+            elseif ref_value < 30 then tgt_value = 87.1
+            elseif ref_value < 35 then tgt_value = 86.2
+            elseif ref_value < 40 then tgt_value = 85.4
+            elseif ref_value < 45 then tgt_value = 85.5
+            elseif ref_value < 50 then tgt_value = 83.6
+            elseif ref_value <= 99 then tgt_value = 82.8 end
+        end
+    end
+    
+    txt_set(ref_text, tgt_value >= 100 and string.format("%.0f", tgt_value) or string.format("%.1f", tgt_value));
+
     if pwr_on == 1 then
         txt_set(pwr_on_text, "ON");
     else
