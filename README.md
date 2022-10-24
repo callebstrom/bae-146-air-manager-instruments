@@ -11,4 +11,4 @@ BAr-146 Instruments for Simstrumentation [Air Manager](https://siminnovations.co
 ![preview](https://github.com/callebstrom/bae-146-air-manager-instruments/raw/master/src/n2_gauge/preview.png)
 
 ### TMS
-<img src="https://user-images.githubusercontent.com/5937782/197408843-31fab9c8-4ecd-4237-9f47-08462ac34af9.png" width="400" />
+<img src="https://raw.githubusercontent.com/callebstrom/bae-146-air-manager-instruments/master/src/tms/preview.png" width="400" />
