@@ -4,7 +4,7 @@ BAe-146 Instruments for Simstrumentation [Air Manager](https://siminnovations.co
 ### TMS
 <img src="https://raw.githubusercontent.com/callebstrom/bae-146-air-manager-instruments/master/src/tms/preview.png" width="300" />
 
-### Autopilot (WIP)
+### Autopilot
 <img src="https://raw.githubusercontent.com/callebstrom/bae-146-air-manager-instruments/master/src/autopilot/preview.png" width="500" />
 
 ### N1 gauge with N1 bug
