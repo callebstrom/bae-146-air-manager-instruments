@@ -349,59 +349,68 @@ function update(eng1_n1,
     latest_values["L:R_TMS_Ref_dig2"] = ref_dig2_cap;
     latest_values["L:R_TMS_Ref_dig3"] = ref_dig3_cap; 
         
-    local tgt_value = 88.8;
+    local nc_value = 88.8;
     
     if tgt_up == 1 then
-        tgt_value = tgt_dig1 * 100 + tgt_dig2 * 10 + tgt_dig3;
+        nc_value = tgt_dig1 * 100 + tgt_dig2 * 10 + tgt_dig3;
     elseif ctrl_n1 == 1 and mstr_1 == 1 then
-        tgt_value = eng1_n1;
+        nc_value = eng1_n1;
     elseif ctrl_n1 == 1 and mstr_2 == 1 then
-        tgt_value = eng2_n1;
+        nc_value = eng2_n1;
     elseif ctrl_n2 == 1 and mstr_1 == 1 then
-        tgt_value = eng1_n2;
+        nc_value = eng1_n2;
     elseif ctrl_n2 == 1 and mstr_2 == 1 then
-        tgt_value = eng2_n2;
+        nc_value = eng2_n2;
     elseif desc_up == 1 then
-        tgt_value = 60.0;
+        nc_value = 60.0;
     elseif mct_up == 1 then
-        tgt_value = 857
+        nc_value = 857
     elseif to1_up or to2_up then
         local ref_value = ref_dig2 * 10 + ref_dig3;
         if ref_dig1 == REF_SIGN_POSITIVE then
-            if ref_value >= 57 then tgt_value = 87.7
-            elseif ref_value > 51 then tgt_value = 88.1
-            elseif ref_value > 46 then tgt_value = 88.6
-            elseif ref_value > 41 then tgt_value = 88.9
-            elseif ref_value > 36 then tgt_value = 89.9
-            elseif ref_value > 31 then tgt_value = 90.7
-            elseif ref_value > 26 then tgt_value = 91.4
-            elseif ref_value > 21 then tgt_value = 92.2
-            elseif ref_value > 16 then tgt_value = 93.0
-            elseif ref_value > 11 then tgt_value = 93.7
-            elseif ref_value > 6 then tgt_value = 92.9
-            elseif ref_value > 1 then tgt_value = 92.1
-            elseif ref_value >= 0 then tgt_value = 91.3 end
+            if ref_value >= 57 then nc_value = 87.7
+            elseif ref_value > 51 then nc_value = 88.1
+            elseif ref_value > 46 then nc_value = 88.6
+            elseif ref_value > 41 then nc_value = 88.9
+            elseif ref_value > 36 then nc_value = 89.9
+            elseif ref_value > 31 then nc_value = 90.7
+            elseif ref_value > 26 then nc_value = 91.4
+            elseif ref_value > 21 then nc_value = 92.2
+            elseif ref_value > 16 then nc_value = 93.0
+            elseif ref_value > 11 then nc_value = 93.7
+            elseif ref_value > 6 then nc_value = 92.9
+            elseif ref_value > 1 then nc_value = 92.1
+            elseif ref_value >= 0 then nc_value = 91.3 end
         elseif ref_dig1 == REF_SIGN_NEGATIVE then
-            if ref_value < 5 then tgt_value = 91.3
-            elseif ref_value < 10 then tgt_value = 90.5
-            elseif ref_value < 15 then tgt_value = 89.7
-            elseif ref_value < 20 then tgt_value = 88.8
-            elseif ref_value < 25 then tgt_value = 87.9
-            elseif ref_value < 30 then tgt_value = 87.1
-            elseif ref_value < 35 then tgt_value = 86.2
-            elseif ref_value < 40 then tgt_value = 85.4
-            elseif ref_value < 45 then tgt_value = 85.5
-            elseif ref_value < 50 then tgt_value = 83.6
-            elseif ref_value <= 99 then tgt_value = 82.8 end
+            if ref_value < 5 then nc_value = 91.3
+            elseif ref_value < 10 then nc_value = 90.5
+            elseif ref_value < 15 then nc_value = 89.7
+            elseif ref_value < 20 then nc_value = 88.8
+            elseif ref_value < 25 then nc_value = 87.9
+            elseif ref_value < 30 then nc_value = 87.1
+            elseif ref_value < 35 then nc_value = 86.2
+            elseif ref_value < 40 then nc_value = 85.4
+            elseif ref_value < 45 then nc_value = 85.5
+            elseif ref_value < 50 then nc_value = 83.6
+            elseif ref_value <= 99 then nc_value = 82.8 end
         end
     end
     
-    txt_set(ref_text, tgt_value >= 100 and string.format("%.0f", tgt_value) or string.format("%.1f", tgt_value));
-
+    has_mode = to1_up == 1
+        or to2_up == 1
+        or mct_up == 1
+        or tgt_up == 1
+        or desc_up == 1
+        or sync_up == 1;
+    
     if pwr_on == 1 then
         txt_set(pwr_on_text, "ON");
+        if has_mode then
+            txt_set(ref_text, nc_value >= 100 and string.format("%.0f", nc_value) or string.format("%.1f", nc_value));
+        end
     else
         txt_set(pwr_on_text, "");
+        txt_set(ref_text, "");
     end
 
     canvas_draw(canvas, function()
