@@ -55,6 +55,52 @@ end
 
 dim_turb()
 
+local key_click_counter = {}
+
+function write(variable)
+    return function(value) fs2020_variable_write(variable, "Number", value) end
+end
+
+local key_handler = {
+    AP = write("L:PED_AFT_AP_In"),
+    GSL = write("L:MCP_Mode_GSL"),
+    ALT = write("L:MCP_Mode_ALT"),
+    VS = write("L:MCP_Mode_VS"),
+    MACH = write("L:MCP_Mode_MACH"),
+    VNAV = write("L:MCP_Mode_VNAV"),
+    IAS = write("L:MCP_Mode_IAS"),
+    VL = write("L:MCP_Mode_VL"),
+    BLOC = write("L:MCP_Mode_BLOC"),
+    TURB = write("L:MCP_Mode_TURB"),
+    LNAV = write("L:MCP_Mode_LNAV"),
+    HDG = write("L:MCP_Mode_HDG")
+}
+
+function on_press(key)
+  if (key_click_counter[key] == nil) then key_click_counter[key] = 0 end;
+  key_click_counter[key] = key_click_counter[key] + 1;
+  local value = key_click_counter[key];
+
+  key_handler[key](value)
+end
+
+local BUTTON_INITIAL_X = 135;
+
+button_add(nil, nil, 520, 59, 162, 107, function() on_press("AP") end, nil)
+
+button_add(nil, nil, BUTTON_INITIAL_X, 228, 162, 107, function() on_press("GSL") end, nil)
+button_add(nil, nil, BUTTON_INITIAL_X + COL_WIDTH, 228, 162, 107, function() on_press("ALT") end, nil)
+button_add(nil, nil, BUTTON_INITIAL_X + (COL_WIDTH * 2), 228, 162, 107, function() on_press("VS") end, nil)
+button_add(nil, nil, BUTTON_INITIAL_X + (COL_WIDTH * 3), 228, 162, 107, function() on_press("MACH") end, nil)
+button_add(nil, nil, BUTTON_INITIAL_X + (COL_WIDTH * 4), 228, 162, 107, function() on_press("VNAV") end, nil)
+button_add(nil, nil, BUTTON_INITIAL_X + (COL_WIDTH * 5), 228, 162, 107, function() on_press("IAS") end, nil)
+
+button_add(nil, nil, BUTTON_INITIAL_X, 434, 162, 107, function() on_press("GSL") end, nil)
+button_add(nil, nil, BUTTON_INITIAL_X + COL_WIDTH, 434, 162, 107, function() on_press("BLOC") end, nil)
+button_add(nil, nil, BUTTON_INITIAL_X + (COL_WIDTH * 2.5), 400, 190, 190, function() on_press("TURB") end, nil)
+button_add(nil, nil, BUTTON_INITIAL_X + (COL_WIDTH * 4), 434, 162, 107, function() on_press("LNAV") end, nil)
+button_add(nil, nil, BUTTON_INITIAL_X + (COL_WIDTH * 5), 434, 162, 107, function() on_press("HDG") end, nil)
+
 function update(ap_mode, gsl_mode, alt_mode, vs_mode, mach_mode, vnav_mode, ias_mode, vl_mode, bloc_mode, lnav_mode, hdg_mode, turb_mode)
     canvas_draw(canvas, function()
         if (ap_mode == 1) then
