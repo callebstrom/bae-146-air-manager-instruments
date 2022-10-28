@@ -7,6 +7,9 @@ BAe-146 Instruments for Simstrumentation [Air Manager](https://siminnovations.co
 ### Autopilot
 <img src="https://raw.githubusercontent.com/callebstrom/bae-146-air-manager-instruments/master/src/autopilot/preview.png" width="500" />
 
+### Altitude alerter
+<img src="https://github.com/callebstrom/bae-146-air-manager-instruments/raw/master/src/altitude_alerter/preview.png" width="500" />
+
 ### N1 gauge with N1 bug
 ![preview](https://github.com/callebstrom/bae-146-air-manager-instruments/raw/master/src/n1_gauge/preview.png)
 
